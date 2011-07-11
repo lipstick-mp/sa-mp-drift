@@ -6,6 +6,8 @@
 #include <iostream>
 #include <math.h>
 #include <vector>
+#include <cstring>
+#include <limits>
 
 /*
 * AMX Includes
