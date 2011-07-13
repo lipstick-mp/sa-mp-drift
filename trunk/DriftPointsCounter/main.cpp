@@ -115,16 +115,15 @@ int OnPlayerDriftStart(int playerid)
     return 0;
 }
 
-int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance);
-int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance)
+int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance,float speed);
+int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance,float speed)
 {
-    //if (playerid == NULL)
-    //    return 0;
     int idx; 
     cell ret;
     int amxerr = amx_FindPublic(pAMX, "OnPlayerDriftUpdate", &idx);
     if (amxerr == AMX_ERR_NONE)
     {
+		amx_Push(pAMX, amx_ftoc(speed));
 		amx_Push(pAMX, amx_ftoc(distance));
 		amx_Push(pAMX, flagid);
 		amx_Push(pAMX, combo);
@@ -139,8 +138,6 @@ int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float dista
 int OnPlayerDriftEnd(int playerid,int points,int combo,int reason);
 int OnPlayerDriftEnd(int playerid,int points,int combo,int reason)
 {
-    //if (playerid == NULL)
-    //    return 0;
     int idx; 
     cell ret;
     int amxerr = amx_FindPublic(pAMX, "OnPlayerDriftEnd", &idx);
@@ -208,6 +205,8 @@ bool IsDriftingAllowedModel(int modelid)
 	}
 }
 
+int didit = 0;
+
 PLUGIN_EXPORT void PLUGIN_CALL
 	ProcessTick()
 {
@@ -218,19 +217,16 @@ PLUGIN_EXPORT void PLUGIN_CALL
 		{
 			if(g_Invoke->callNative(&PAWN::GetPlayerState,playerid) == PLAYER_STATE_DRIVER)
 			{
-				//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0xFFFFFFFF,"1");
 				PlayerVehicleID[playerid] = g_Invoke->callNative(&PAWN::GetPlayerVehicleID,playerid);
 				#if defined USE_VEHICLE_MODEL_CHECK
 				bool allowed = IsDriftingAllowedModel(g_Invoke->callNative(&PAWN::GetVehicleModel,PlayerVehicleID[playerid]));
 				#endif
 				if(DamageCheck[playerid] == 1 && Drifting[playerid] == 1)
 				{
-					//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0xFFFF00FF,"2 - Damage Check initialized");
 					float tempheal;
 					g_Invoke->callNative(&PAWN::GetVehicleHealth,PlayerVehicleID[playerid], &tempheal);
 					if(VehicleHealth[playerid] != tempheal)
 					{
-						//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0xFFFF00FF,"2 - Damage Check passed");
 		 				GlobalPos_Timer[playerid] = (-1);
 						OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],1);
 						GlobalPos_Combo[playerid] = 0;
@@ -242,7 +238,6 @@ PLUGIN_EXPORT void PLUGIN_CALL
 				g_Invoke->callNative(&PAWN::GetVehicleVelocity,PlayerVehicleID[playerid], &SpeedX[playerid], &SpeedY[playerid], &SpeedZ[playerid]);
 				floatdata[playerid][3] = GlobalPos_Angle1[playerid];
 				g_Invoke->callNative(&PAWN::GetVehicleZAngle, PlayerVehicleID[playerid], &GlobalPos_Angle1[playerid]);
-				//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0xFF00FFFF,"3");
 				bool forward = true;
 				if(GlobalPos_Angle1[playerid] < 90)
 				{
@@ -258,8 +253,8 @@ PLUGIN_EXPORT void PLUGIN_CALL
 				}
 				else if(SpeedX[playerid] < 0 && SpeedY[playerid] < 0) forward = false;
 
-				g_Invoke->callNative(&PAWN::GetPlayerPos, playerid, &floatdata[playerid][4], &floatdata[playerid][5], &floatdata[playerid][6]);
 				floatdata[playerid][10] = sqrt(pow(SpeedX[playerid], 2)+pow(SpeedY[playerid], 2)+pow(SpeedZ[playerid], 2))*274;
+				g_Invoke->callNative(&PAWN::GetPlayerPos, playerid, &floatdata[playerid][4], &floatdata[playerid][5], &floatdata[playerid][6]);
 				floatdata[playerid][1] = sqrt(pow((floatdata[playerid][4]-GlobalPos_X[playerid]),2)+pow((floatdata[playerid][5]-GlobalPos_Y[playerid]),2));
 
 
@@ -289,8 +284,7 @@ PLUGIN_EXPORT void PLUGIN_CALL
 				} else {
 					GlobalPos_Angle2[playerid]  =  floatdata[playerid][9];
 				}
-				//if(playerid == 0)cout << "forward playerid 0 is: " << forward;
-				//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0xFF0000FF,"4");
+
 				float angle = abs(GlobalPos_Angle1[playerid]-GlobalPos_Angle2[playerid]);
 				if(
 						#if defined CHECK_MAX_VALUES
@@ -314,6 +308,7 @@ PLUGIN_EXPORT void PLUGIN_CALL
 						GlobalPos_Combo[playerid] += 1;
 						if(flagcheckingstatus[playerid] == 1)
 						{
+							didit = 0;
 							for(int i = 0,j = BonusPoint.size(); i < j; i++)
 							{
 								if(BonusPoint[i].enabled == 1)
@@ -321,17 +316,24 @@ PLUGIN_EXPORT void PLUGIN_CALL
 									float dist = sqrt(pow(BonusPoint[i].xPOS-floatdata[playerid][4],2)+pow(BonusPoint[i].yPOS-floatdata[playerid][5],2)+pow(BonusPoint[i].zPOS-floatdata[playerid][6],2));
 									if(dist < 10.0)
 									{
-										OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],i,dist);
+										OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],i,dist,floatdata[playerid][10]);
+										didit = 1;
 									}
 								}
 							}
+							if(didit == 0)
+							{
+								OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],-1,-1.0,floatdata[playerid][10]);
+							}
 						}
-						OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],-1,-1.0);				
+						else
+						{
+							OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],-1,-1.0,floatdata[playerid][10]);
+						}
 					}
 					else
 					{
 						Drifting[playerid] = 1;
-						//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0x666666FF,"5 - Drift Started");
 						g_Invoke->callNative(&PAWN::GetVehicleHealth,PlayerVehicleID[playerid], &VehicleHealth[playerid]);
 						OnPlayerDriftStart(playerid);
 					}
@@ -345,7 +347,6 @@ PLUGIN_EXPORT void PLUGIN_CALL
 		 				GlobalPos_Timer[playerid]--;
 		 				if(GlobalPos_Timer[playerid] == -1)
 		 				{
-							//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0x0066FFFF,"5 - Drift Ended");
 							OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
 							GlobalPos_Combo[playerid] = 0;
 							GlobalPos_Points[playerid] = 0;
@@ -353,10 +354,6 @@ PLUGIN_EXPORT void PLUGIN_CALL
 		 				}
 		 			}
 		 		}
-				#if defined USE_VEHICLE_MODEL_CHECK
-			}
-				}
-				#endif
 				GlobalPos_X[playerid] = floatdata[playerid][4];
 				GlobalPos_Y[playerid] = floatdata[playerid][5];
 				GlobalPos_Z[playerid] = floatdata[playerid][6];
@@ -366,15 +363,11 @@ PLUGIN_EXPORT void PLUGIN_CALL
 		 		if(GlobalPos_Timer[playerid] != -1)
 		 		{
 					Drifting_precise[playerid] = 0;
-		 			GlobalPos_Timer[playerid]--;
-		 			if(GlobalPos_Timer[playerid] == -1)
-		 			{
-						//if(playerid == 0)g_Invoke->callNative(&PAWN::SendClientMessage,playerid,0x0066FFFF,"5 - Drift Ended");
-						OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
-						GlobalPos_Combo[playerid] = 0;
-						GlobalPos_Points[playerid] = 0;
-						Drifting[playerid] = 0;
-		 			}
+		 			GlobalPos_Timer[playerid] = -1;
+					OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
+					GlobalPos_Combo[playerid] = 0;
+					GlobalPos_Points[playerid] = 0;
+					Drifting[playerid] = 0;
 		 		}
 			}
 			playerid++;
