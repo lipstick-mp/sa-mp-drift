@@ -97,6 +97,8 @@ struct BonusData
 
 vector <BonusData> BonusPoint;
 
+vector<int> PlayerLoopList;
+
 int g_Ticked = 0;
 int g_TickMax = PLUGIN_PRIVATE_UPDATE_DRIFT;
 
@@ -213,10 +215,13 @@ PLUGIN_EXPORT void PLUGIN_CALL
 	if(g_Ticked == g_TickMax)
 	{
 		int playerid = 0;
-		while(playerid != (MAX_PLAYERS-1))
+		int size = PlayerLoopList.size();
+		int index = 0;
+		for (index = 0; index < size; ++index)
 		{
-			if(g_Invoke->callNative(&PAWN::GetPlayerState,playerid) == PLAYER_STATE_DRIVER)
-			{
+			//if(g_Invoke->callNative(&PAWN::GetPlayerState,playerid) == PLAYER_STATE_DRIVER)
+			//{
+				playerid = PlayerLoopList.at(index);
 				PlayerVehicleID[playerid] = g_Invoke->callNative(&PAWN::GetPlayerVehicleID,playerid);
 				#if defined USE_VEHICLE_MODEL_CHECK
 				bool allowed = IsDriftingAllowedModel(g_Invoke->callNative(&PAWN::GetVehicleModel,PlayerVehicleID[playerid]));
@@ -358,7 +363,7 @@ PLUGIN_EXPORT void PLUGIN_CALL
 				GlobalPos_Y[playerid] = floatdata[playerid][5];
 				GlobalPos_Z[playerid] = floatdata[playerid][6];
 			}
-			else if(Drifting[playerid] == 1)
+		/*	else if(Drifting[playerid] == 1)
 			{
 		 		if(GlobalPos_Timer[playerid] != -1)
 		 		{
@@ -369,9 +374,9 @@ PLUGIN_EXPORT void PLUGIN_CALL
 					GlobalPos_Points[playerid] = 0;
 					Drifting[playerid] = 0;
 		 		}
-			}
-			playerid++;
-		}
+			}*/
+		//	playerid++;
+		//}
 		g_Ticked = -1;
 	}
 	g_Ticked += 1;
@@ -696,7 +701,56 @@ static cell AMX_NATIVE_CALL MoveFLAG( AMX* amx, cell* params )
 	BonusPoint[params[1]].zPOS = posz;
 	return 1;
 }
-
+int WasAdded[MAX_PLAYERS];
+static cell AMX_NATIVE_CALL ChangeState( AMX* amx, cell* params )
+{
+	int playerid = params[1];
+	int newstate = params[2];
+	if(newstate == PLAYER_STATE_DRIVER && WasAdded[playerid] == 0)
+	{
+		WasAdded[playerid] = 1;
+		int size = PlayerLoopList.size();
+		for (int index=0; index < size; ++index)
+		{
+			if(PlayerLoopList.at(index) == playerid)
+			{
+				return 1;//avoid double adding
+			}
+		}
+		PlayerLoopList.push_back(playerid);
+		return 1;
+	}
+	else
+	if(WasAdded[playerid] == 1)
+	{
+		WasAdded[playerid] = 0;
+		int size = PlayerLoopList.size();
+		for (int index=0; index < size; ++index)
+		{
+			if(PlayerLoopList.at(index) == playerid)
+			{
+				PlayerLoopList.erase(PlayerLoopList.begin()+index);
+				if(Drifting[playerid] == 1)
+				{
+		 			if(GlobalPos_Timer[playerid] != -1)
+		 			{
+						Drifting_precise[playerid] = 0;
+		 				GlobalPos_Timer[playerid] = -1;
+						OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
+						GlobalPos_Combo[playerid] = 0;
+						GlobalPos_Points[playerid] = 0;
+						Drifting[playerid] = 0;
+						return 3;
+		 			}
+					return 2;
+				}
+				return 1;
+			}
+		}
+		return 0;
+	}
+	return 1;
+}
 static cell AMX_NATIVE_CALL SetCheckForFlags( AMX* amx, cell* params )
 {
 	int gg_divider = params[1];
@@ -811,6 +865,7 @@ AMX_NATIVE_INFO driftAMXNatives[ ] =
 	{"Drift_SetCheckForFlags",SetCheckForFlags},
 	{"Drift_GetCheckForFlags",GetCheckForFlags},
 
+	{"Drift_Private_ChangeState", ChangeState},
 	{0,                0}
 };
 
