@@ -673,6 +673,10 @@ static cell AMX_NATIVE_CALL SetDamageCheck( AMX* amx, cell* params )
 	{
 		MLH = 0.0;
 	}
+	if(MLH > 1000.0)
+	{
+		MLH = 1000.0;
+	}
 	if(params[1] >= 1)
 	{
 		gg_divider = 1;
@@ -687,12 +691,14 @@ static cell AMX_NATIVE_CALL SetDamageCheck( AMX* amx, cell* params )
 		while(playerid != MAX_PLAYERS-1)
 		{
 			DamageCheck[playerid] = gg_divider;
+			MaxHealthLoose[playerid] = MLH;
 			playerid++;
 		}
 	}
 	else
 	{
 		DamageCheck[params[2]] = gg_divider;
+		MaxHealthLoose[params[2]] = MLH;
 	}
 	return 1;
 }
@@ -783,6 +789,9 @@ static cell AMX_NATIVE_CALL GetGlobalCheck( AMX* amx, cell* params )
 
 static cell AMX_NATIVE_CALL GetDamageCheck( AMX* amx, cell* params )
 {
+	cell* cptr;
+	amx_GetAddr(amx, params[2], &cptr);
+	*cptr = amx_ftoc(MaxHealthLoose[params[1]]);
 	return DamageCheck[params[1]];
 }
 
