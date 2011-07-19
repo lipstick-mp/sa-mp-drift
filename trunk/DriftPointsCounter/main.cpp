@@ -79,10 +79,30 @@ int Drifting[MAX_PLAYERS];
 int Drifting_precise[MAX_PLAYERS];
 
 int DriftStartEndDelay[MAX_PLAYERS] = {START_END_DELAY};
+
+int GlobalCheck = 1;
+
+int g_Ticked = 0;
+int g_TickMax = PLUGIN_PRIVATE_UPDATE_DRIFT;
+int didit = 0;
+int WasAdded[MAX_PLAYERS];
+
+int GlobOnUpdateIndex = (-1);
+int GlobOnStartIndex = (-1);
+int GlobOnEndIndex = (-1);
+
+#define DEFAULT_MAX_HEALTH_LOOSE (0.0);
+
+float MaxHealthLoose[MAX_PLAYERS];
+
+#define DEFAULT_CHECK (1)
+
+int CheckHim[MAX_PLAYERS];
+
+#define DEFAULT_BACKWARDS (1)
+int CheckBackwards[MAX_PLAYERS];
 //#define USE_VEHICLE_MODEL_CHECK
 //#define CHECK_MAX_VALUES
-
-//#define MAX_POINTS (1000)
 
 struct BonusData
 {
@@ -91,27 +111,18 @@ struct BonusData
 	float yPOS;
 	float zPOS;
 	BonusData(int n0,float n1,float n2,float n3):enabled(n0),xPOS(n1),yPOS(n2),zPOS(n3){}
-} 
-//BonusPoint[MAX_POINTS]
-;
+} ;
 
 vector <BonusData> BonusPoint;
-
 vector<int> PlayerLoopList;
-
-int g_Ticked = 0;
-int g_TickMax = PLUGIN_PRIVATE_UPDATE_DRIFT;
 
 int OnPlayerDriftStart(int playerid);
 int OnPlayerDriftStart(int playerid)
 {
-    int idx; 
-    cell ret;
-    int amxerr = amx_FindPublic(pAMX, "OnPlayerDriftStart", &idx);
-    if (amxerr == AMX_ERR_NONE)
+    if (GlobOnStartIndex != (-1))
     {
 		amx_Push(pAMX, playerid);
-		amx_Exec(pAMX, &ret, idx);
+		amx_Exec(pAMX, NULL, GlobOnStartIndex);
         return 1;
     }
     return 0;
@@ -120,10 +131,7 @@ int OnPlayerDriftStart(int playerid)
 int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance,float speed);
 int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance,float speed)
 {
-    int idx; 
-    cell ret;
-    int amxerr = amx_FindPublic(pAMX, "OnPlayerDriftUpdate", &idx);
-    if (amxerr == AMX_ERR_NONE)
+    if (GlobOnUpdateIndex != (-1))
     {
 		amx_Push(pAMX, amx_ftoc(speed));
 		amx_Push(pAMX, amx_ftoc(distance));
@@ -131,7 +139,7 @@ int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float dista
 		amx_Push(pAMX, combo);
 		amx_Push(pAMX, points);
 		amx_Push(pAMX, playerid);
-		amx_Exec(pAMX, &ret, idx);
+		amx_Exec(pAMX, NULL, GlobOnUpdateIndex);
         return 1;
     }
     return 0;
@@ -140,16 +148,13 @@ int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float dista
 int OnPlayerDriftEnd(int playerid,int points,int combo,int reason);
 int OnPlayerDriftEnd(int playerid,int points,int combo,int reason)
 {
-    int idx; 
-    cell ret;
-    int amxerr = amx_FindPublic(pAMX, "OnPlayerDriftEnd", &idx);
-    if (amxerr == AMX_ERR_NONE)
+    if (GlobOnEndIndex != (-1))
     {
 		amx_Push(pAMX, reason);
 		amx_Push(pAMX, combo);
 		amx_Push(pAMX, points);
 		amx_Push(pAMX, playerid);
-		amx_Exec(pAMX, &ret, idx);
+		amx_Exec(pAMX, NULL, GlobOnEndIndex);
         return 1;
     }
     return 0;
@@ -207,179 +212,192 @@ bool IsDriftingAllowedModel(int modelid)
 	}
 }
 
-int didit = 0;
-
 PLUGIN_EXPORT void PLUGIN_CALL
 	ProcessTick()
 {
-	if(g_Ticked == g_TickMax)
+	if(GlobalCheck == 1)
 	{
-		int playerid = 0;
-		int size = PlayerLoopList.size();
-		int index = 0;
-		for (index = 0; index < size; ++index)
+		if(g_Ticked == g_TickMax)
 		{
-			//if(g_Invoke->callNative(&PAWN::GetPlayerState,playerid) == PLAYER_STATE_DRIVER)
-			//{
-				playerid = PlayerLoopList.at(index);
-				PlayerVehicleID[playerid] = g_Invoke->callNative(&PAWN::GetPlayerVehicleID,playerid);
-				#if defined USE_VEHICLE_MODEL_CHECK
-				bool allowed = IsDriftingAllowedModel(g_Invoke->callNative(&PAWN::GetVehicleModel,PlayerVehicleID[playerid]));
-				#endif
-				if(DamageCheck[playerid] == 1 && Drifting[playerid] == 1)
-				{
-					float tempheal;
-					g_Invoke->callNative(&PAWN::GetVehicleHealth,PlayerVehicleID[playerid], &tempheal);
-					if(VehicleHealth[playerid] != tempheal)
+			int playerid = 0;
+			int size = PlayerLoopList.size();
+			int index = 0;
+			for (index = 0; index < size; ++index)
+			{
+				//if(g_Invoke->callNative(&PAWN::GetPlayerState,playerid) == PLAYER_STATE_DRIVER)
+				//{
+					playerid = PlayerLoopList.at(index);
+					if(CheckHim[playerid] == 0)continue;
+					PlayerVehicleID[playerid] = g_Invoke->callNative(&PAWN::GetPlayerVehicleID,playerid);
+					#if defined USE_VEHICLE_MODEL_CHECK
+					bool allowed = IsDriftingAllowedModel(g_Invoke->callNative(&PAWN::GetVehicleModel,PlayerVehicleID[playerid]));
+					#endif
+					if(DamageCheck[playerid] == 1 && Drifting[playerid] == 1)
 					{
-		 				GlobalPos_Timer[playerid] = (-1);
-						OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],1);
-						GlobalPos_Combo[playerid] = 0;
-						GlobalPos_Points[playerid] = 0;
-						Drifting[playerid] = 0;
-						continue;
-					}
-				}
-				g_Invoke->callNative(&PAWN::GetVehicleVelocity,PlayerVehicleID[playerid], &SpeedX[playerid], &SpeedY[playerid], &SpeedZ[playerid]);
-				floatdata[playerid][3] = GlobalPos_Angle1[playerid];
-				g_Invoke->callNative(&PAWN::GetVehicleZAngle, PlayerVehicleID[playerid], &GlobalPos_Angle1[playerid]);
-				bool forward = true;
-				if(GlobalPos_Angle1[playerid] < 90)
-				{
-					if(SpeedX[playerid] > 0 && SpeedY[playerid] < 0) forward = false;
-				}
-				else if(GlobalPos_Angle1[playerid] < 180)
-				{
-					if(SpeedX[playerid] > 0 && SpeedY[playerid] > 0) forward = false;
-				}
-				else if(GlobalPos_Angle1[playerid] < 270)
-				{
-					if(SpeedX[playerid] < 0 && SpeedY[playerid] > 0) forward = false;
-				}
-				else if(SpeedX[playerid] < 0 && SpeedY[playerid] < 0) forward = false;
-
-				floatdata[playerid][10] = sqrt(pow(SpeedX[playerid], 2)+pow(SpeedY[playerid], 2)+pow(SpeedZ[playerid], 2))*274;
-				g_Invoke->callNative(&PAWN::GetPlayerPos, playerid, &floatdata[playerid][4], &floatdata[playerid][5], &floatdata[playerid][6]);
-				floatdata[playerid][1] = sqrt(pow((floatdata[playerid][4]-GlobalPos_X[playerid]),2)+pow((floatdata[playerid][5]-GlobalPos_Y[playerid]),2));
-
-
-				if(floatdata[playerid][4]>GlobalPos_X[playerid]){floatdata[playerid][7]=floatdata[playerid][4]-GlobalPos_X[playerid];}else{floatdata[playerid][7]=GlobalPos_X[playerid]-floatdata[playerid][4];}
-			
-				if(floatdata[playerid][5]>GlobalPos_Y[playerid]){floatdata[playerid][8]=floatdata[playerid][5]-GlobalPos_Y[playerid];}else{floatdata[playerid][8]=GlobalPos_Y[playerid]-floatdata[playerid][5];}
-			
-				if(GlobalPos_Y[playerid]>floatdata[playerid][5] && GlobalPos_X[playerid]>floatdata[playerid][4]){ //1
-					floatdata[playerid][0] = asin(floatdata[playerid][7]/floatdata[playerid][1])* 180 / PI;
-					floatdata[playerid][9] = (floatdata[playerid][0]+90)-(floatdata[playerid][0]*2)+90;
-				}
-				if(GlobalPos_Y[playerid]<floatdata[playerid][5] && GlobalPos_X[playerid]>floatdata[playerid][4]){ //2
-					floatdata[playerid][0] = asin(floatdata[playerid][7]/floatdata[playerid][1])* 180 / PI;
-					floatdata[playerid][9] = (floatdata[playerid][0]+180)-180;
-				}
-				if(GlobalPos_Y[playerid]<floatdata[playerid][5] && GlobalPos_X[playerid]<floatdata[playerid][4]){ //3
-					floatdata[playerid][0] = acos(floatdata[playerid][8]/floatdata[playerid][1])* 180 / PI;
-					floatdata[playerid][9] = (floatdata[playerid][0]+360)-(floatdata[playerid][0]*2);
-				}
-				if(GlobalPos_Y[playerid]>floatdata[playerid][5] && GlobalPos_X[playerid]<floatdata[playerid][4]){ //4
-					floatdata[playerid][0] = asin(floatdata[playerid][7]/floatdata[playerid][1])* 180 / PI;
-					floatdata[playerid][9] = floatdata[playerid][0]+180;
-				}
-				if(floatdata[playerid][9] == 0.0)
-				{
-					GlobalPos_Angle2[playerid] =  GlobalPos_Angle1[playerid];
-				} else {
-					GlobalPos_Angle2[playerid]  =  floatdata[playerid][9];
-				}
-
-				float angle = abs(GlobalPos_Angle1[playerid]-GlobalPos_Angle2[playerid]);
-				if(
-						#if defined CHECK_MAX_VALUES
-						g_MaxAngle[playerid]  > angle && 
-						#endif
-						angle > g_MinAngle[playerid] && 
-						floatdata[playerid][10] > g_MinSpeed[playerid] 
-						#if defined CHECK_MAX_VALUES
-						&& floatdata[playerid][10] < g_MaxSpeed[playerid]
-						#endif
-						&& forward == true
-						#if defined USE_VEHICLE_MODEL_CHECK
-						&& allowed == true
-						#endif
-				)
-		 		{
-					GlobalPos_Points[playerid] += (int)(floor(angle * floatdata[playerid][10])/g_divider[playerid]);
-					if(GlobalPos_Timer[playerid] != -1)
-					{
-						Drifting_precise[playerid] = 1;
-						GlobalPos_Combo[playerid] += 1;
-						if(flagcheckingstatus[playerid] == 1)
+						float tempheal;
+						g_Invoke->callNative(&PAWN::GetVehicleHealth,PlayerVehicleID[playerid], &tempheal);
+						if(VehicleHealth[playerid] != tempheal)
 						{
-							didit = 0;
-							for(int i = 0,j = BonusPoint.size(); i < j; i++)
+							if(MaxHealthLoose[playerid] < abs(VehicleHealth[playerid]-tempheal))
 							{
-								if(BonusPoint[i].enabled == 1)
+		 						GlobalPos_Timer[playerid] = (-1);
+								OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],1);
+								GlobalPos_Combo[playerid] = 0;
+								GlobalPos_Points[playerid] = 0;
+								Drifting[playerid] = 0;
+							}
+							else
+							{
+								VehicleHealth[playerid] = tempheal;
+							}
+							continue;
+						}
+					}
+					g_Invoke->callNative(&PAWN::GetVehicleVelocity,PlayerVehicleID[playerid], &SpeedX[playerid], &SpeedY[playerid], &SpeedZ[playerid]);
+					floatdata[playerid][3] = GlobalPos_Angle1[playerid];
+					g_Invoke->callNative(&PAWN::GetVehicleZAngle, PlayerVehicleID[playerid], &GlobalPos_Angle1[playerid]);
+
+					bool forward = true;
+					if(CheckBackwards[playerid] == 1)
+					{
+						if(GlobalPos_Angle1[playerid] < 90)
+						{
+							if(SpeedX[playerid] > 0 && SpeedY[playerid] < 0) forward = false;
+						}
+						else if(GlobalPos_Angle1[playerid] < 180)
+						{
+							if(SpeedX[playerid] > 0 && SpeedY[playerid] > 0) forward = false;
+						}
+						else if(GlobalPos_Angle1[playerid] < 270)
+						{
+							if(SpeedX[playerid] < 0 && SpeedY[playerid] > 0) forward = false;
+						}
+						else if(SpeedX[playerid] < 0 && SpeedY[playerid] < 0) forward = false;
+					}
+
+					floatdata[playerid][10] = sqrt(pow(SpeedX[playerid], 2)+pow(SpeedY[playerid], 2)+pow(SpeedZ[playerid], 2))*274;
+					g_Invoke->callNative(&PAWN::GetPlayerPos, playerid, &floatdata[playerid][4], &floatdata[playerid][5], &floatdata[playerid][6]);
+					floatdata[playerid][1] = sqrt(pow((floatdata[playerid][4]-GlobalPos_X[playerid]),2)+pow((floatdata[playerid][5]-GlobalPos_Y[playerid]),2));
+
+
+					if(floatdata[playerid][4]>GlobalPos_X[playerid]){floatdata[playerid][7]=floatdata[playerid][4]-GlobalPos_X[playerid];}else{floatdata[playerid][7]=GlobalPos_X[playerid]-floatdata[playerid][4];}
+			
+					if(floatdata[playerid][5]>GlobalPos_Y[playerid]){floatdata[playerid][8]=floatdata[playerid][5]-GlobalPos_Y[playerid];}else{floatdata[playerid][8]=GlobalPos_Y[playerid]-floatdata[playerid][5];}
+			
+					if(GlobalPos_Y[playerid]>floatdata[playerid][5] && GlobalPos_X[playerid]>floatdata[playerid][4]){ //1
+						floatdata[playerid][0] = asin(floatdata[playerid][7]/floatdata[playerid][1])* 180 / PI;
+						floatdata[playerid][9] = (floatdata[playerid][0]+90)-(floatdata[playerid][0]*2)+90;
+					}
+					if(GlobalPos_Y[playerid]<floatdata[playerid][5] && GlobalPos_X[playerid]>floatdata[playerid][4]){ //2
+						floatdata[playerid][0] = asin(floatdata[playerid][7]/floatdata[playerid][1])* 180 / PI;
+						floatdata[playerid][9] = (floatdata[playerid][0]+180)-180;
+					}
+					if(GlobalPos_Y[playerid]<floatdata[playerid][5] && GlobalPos_X[playerid]<floatdata[playerid][4]){ //3
+						floatdata[playerid][0] = acos(floatdata[playerid][8]/floatdata[playerid][1])* 180 / PI;
+						floatdata[playerid][9] = (floatdata[playerid][0]+360)-(floatdata[playerid][0]*2);
+					}
+					if(GlobalPos_Y[playerid]>floatdata[playerid][5] && GlobalPos_X[playerid]<floatdata[playerid][4]){ //4
+						floatdata[playerid][0] = asin(floatdata[playerid][7]/floatdata[playerid][1])* 180 / PI;
+						floatdata[playerid][9] = floatdata[playerid][0]+180;
+					}
+					if(floatdata[playerid][9] == 0.0)
+					{
+						GlobalPos_Angle2[playerid] =  GlobalPos_Angle1[playerid];
+					} else {
+						GlobalPos_Angle2[playerid]  =  floatdata[playerid][9];
+					}
+
+					float angle = abs(GlobalPos_Angle1[playerid]-GlobalPos_Angle2[playerid]);
+					if(
+							#if defined CHECK_MAX_VALUES
+							g_MaxAngle[playerid]  > angle && 
+							#endif
+							angle > g_MinAngle[playerid] && 
+							floatdata[playerid][10] > g_MinSpeed[playerid] 
+							#if defined CHECK_MAX_VALUES
+							&& floatdata[playerid][10] < g_MaxSpeed[playerid]
+							#endif
+							&& forward == true
+							#if defined USE_VEHICLE_MODEL_CHECK
+							&& allowed == true
+							#endif
+					)
+		 			{
+						GlobalPos_Points[playerid] += (int)(floor(angle * floatdata[playerid][10])/g_divider[playerid]);
+						if(GlobalPos_Timer[playerid] != -1)
+						{
+							Drifting_precise[playerid] = 1;
+							GlobalPos_Combo[playerid] += 1;
+							if(flagcheckingstatus[playerid] == 1)
+							{
+								didit = 0;
+								for(int i = 0,j = BonusPoint.size(); i < j; i++)
 								{
-									float dist = sqrt(pow(BonusPoint[i].xPOS-floatdata[playerid][4],2)+pow(BonusPoint[i].yPOS-floatdata[playerid][5],2)+pow(BonusPoint[i].zPOS-floatdata[playerid][6],2));
-									if(dist < 10.0)
+									if(BonusPoint[i].enabled == 1)
 									{
-										OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],i,dist,floatdata[playerid][10]);
-										didit = 1;
+										float dist = sqrt(pow(BonusPoint[i].xPOS-floatdata[playerid][4],2)+pow(BonusPoint[i].yPOS-floatdata[playerid][5],2)+pow(BonusPoint[i].zPOS-floatdata[playerid][6],2));
+										if(dist < 10.0)
+										{
+											OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],i,dist,floatdata[playerid][10]);
+											didit = 1;
+										}
 									}
 								}
+								if(didit == 0)
+								{
+									OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],-1,-1.0,floatdata[playerid][10]);
+								}
 							}
-							if(didit == 0)
+							else
 							{
 								OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],-1,-1.0,floatdata[playerid][10]);
 							}
 						}
 						else
 						{
-							OnPlayerDriftUpdate(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],-1,-1.0,floatdata[playerid][10]);
+							Drifting[playerid] = 1;
+							g_Invoke->callNative(&PAWN::GetVehicleHealth,PlayerVehicleID[playerid], &VehicleHealth[playerid]);
+							OnPlayerDriftStart(playerid);
 						}
-					}
-					else
-					{
-						Drifting[playerid] = 1;
-						g_Invoke->callNative(&PAWN::GetVehicleHealth,PlayerVehicleID[playerid], &VehicleHealth[playerid]);
-						OnPlayerDriftStart(playerid);
-					}
-					GlobalPos_Timer[playerid] = DriftStartEndDelay[playerid];
-		 		}
-		 		else
-		 		{
+						GlobalPos_Timer[playerid] = DriftStartEndDelay[playerid];
+		 			}
+		 			else
+		 			{
+		 				if(GlobalPos_Timer[playerid] != -1)
+		 				{
+							Drifting_precise[playerid] = 0;
+		 					GlobalPos_Timer[playerid]--;
+		 					if(GlobalPos_Timer[playerid] == -1)
+		 					{
+								OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
+								GlobalPos_Combo[playerid] = 0;
+								GlobalPos_Points[playerid] = 0;
+								Drifting[playerid] = 0;
+		 					}
+		 				}
+		 			}
+					GlobalPos_X[playerid] = floatdata[playerid][4];
+					GlobalPos_Y[playerid] = floatdata[playerid][5];
+					GlobalPos_Z[playerid] = floatdata[playerid][6];
+				}
+			/*	else if(Drifting[playerid] == 1)
+				{
 		 			if(GlobalPos_Timer[playerid] != -1)
 		 			{
 						Drifting_precise[playerid] = 0;
-		 				GlobalPos_Timer[playerid]--;
-		 				if(GlobalPos_Timer[playerid] == -1)
-		 				{
-							OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
-							GlobalPos_Combo[playerid] = 0;
-							GlobalPos_Points[playerid] = 0;
-							Drifting[playerid] = 0;
-		 				}
+		 				GlobalPos_Timer[playerid] = -1;
+						OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
+						GlobalPos_Combo[playerid] = 0;
+						GlobalPos_Points[playerid] = 0;
+						Drifting[playerid] = 0;
 		 			}
-		 		}
-				GlobalPos_X[playerid] = floatdata[playerid][4];
-				GlobalPos_Y[playerid] = floatdata[playerid][5];
-				GlobalPos_Z[playerid] = floatdata[playerid][6];
-			}
-		/*	else if(Drifting[playerid] == 1)
-			{
-		 		if(GlobalPos_Timer[playerid] != -1)
-		 		{
-					Drifting_precise[playerid] = 0;
-		 			GlobalPos_Timer[playerid] = -1;
-					OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
-					GlobalPos_Combo[playerid] = 0;
-					GlobalPos_Points[playerid] = 0;
-					Drifting[playerid] = 0;
-		 		}
-			}*/
-		//	playerid++;
-		//}
-		g_Ticked = -1;
+				}*/
+			//	playerid++;
+			//}
+			g_Ticked = -1;
+		}
+		g_Ticked += 1;
 	}
-	g_Ticked += 1;
 }
 
 static cell AMX_NATIVE_CALL SetDriftUpdateDelay( AMX* amx, cell* params )
@@ -564,6 +582,42 @@ static cell AMX_NATIVE_CALL n_DriftStartEndDelay( AMX* amx, cell* params )
 	return 1;
 }
 
+static cell AMX_NATIVE_CALL SetDriftMaxHealthLoose( AMX* amx, cell* params )
+{
+	float val = amx_ctof(params[1]);
+	float gg_MinAngle = val;
+	if(val >= 1000.0)
+	{
+		gg_MinAngle = 1000.0;
+	}
+	if(val <= 0.0)
+	{
+		gg_MinAngle = 0.0;
+	}
+	if(params[2] == (-1))
+	{
+		int playerid = 0;
+		while(playerid != MAX_PLAYERS-1)
+		{
+			MaxHealthLoose[playerid] = gg_MinAngle;
+			playerid++;
+		}
+	}
+	else
+	{
+		MaxHealthLoose[params[2]] = gg_MinAngle;
+	}
+	return 1;
+}
+
+static cell AMX_NATIVE_CALL GetDriftMaxHealthLoose( AMX* amx, cell* params )
+{
+	cell* cptr;
+	amx_GetAddr(amx, params[1], &cptr);
+	*cptr = amx_ftoc(MaxHealthLoose[params[2]]);
+	return 1;
+}
+
 static cell AMX_NATIVE_CALL GetDriftMinSpeed( AMX* amx, cell* params )
 {
 	cell* cptr;
@@ -614,6 +668,11 @@ static cell AMX_NATIVE_CALL GetDriftDivider( AMX* amx, cell* params )
 static cell AMX_NATIVE_CALL SetDamageCheck( AMX* amx, cell* params )
 {
 	int gg_divider = params[1];
+	float MLH = amx_ctof(params[3]);
+	if(MLH < 0.0)
+	{
+		MLH = 0.0;
+	}
 	if(params[1] >= 1)
 	{
 		gg_divider = 1;
@@ -636,6 +695,90 @@ static cell AMX_NATIVE_CALL SetDamageCheck( AMX* amx, cell* params )
 		DamageCheck[params[2]] = gg_divider;
 	}
 	return 1;
+}
+
+static cell AMX_NATIVE_CALL SetGlobalCheck( AMX* amx, cell* params )
+{
+	int gg_divider = params[1];
+	if(params[1] >= 1)
+	{
+		gg_divider = 1;
+	}
+	if(params[1] <= 0)
+	{
+		gg_divider = 0;
+	}
+	GlobalCheck = gg_divider;
+	return 1;
+}
+
+static cell AMX_NATIVE_CALL SetPlayerCheck( AMX* amx, cell* params )
+{
+	int gg_divider = params[2];
+	if(params[2] >= 1)
+	{
+		gg_divider = 1;
+	}
+	if(params[2] <= 0)
+	{
+		gg_divider = 0;
+	}
+	if(params[1] == (-1))
+	{
+		int playerid = 0;
+		while(playerid != MAX_PLAYERS-1)
+		{
+			CheckHim[playerid] = gg_divider;
+			playerid++;
+		}
+	}
+	else
+	{
+		CheckHim[params[1]] = gg_divider;
+	}
+	return 1;
+}
+
+static cell AMX_NATIVE_CALL GetPlayerCheck( AMX* amx, cell* params )
+{
+	return CheckHim[params[1]];
+}
+
+static cell AMX_NATIVE_CALL SetBackwardsCheck( AMX* amx, cell* params )
+{
+	int gg_divider = params[2];
+	if(params[2] >= 1)
+	{
+		gg_divider = 1;
+	}
+	if(params[2] <= 0)
+	{
+		gg_divider = 0;
+	}
+	if(params[1] == (-1))
+	{
+		int playerid = 0;
+		while(playerid != MAX_PLAYERS-1)
+		{
+			CheckBackwards[playerid] = gg_divider;
+			playerid++;
+		}
+	}
+	else
+	{
+		CheckBackwards[params[1]] = gg_divider;
+	}
+	return 1;
+}
+
+static cell AMX_NATIVE_CALL GetBackwardsCheck( AMX* amx, cell* params )
+{
+	return CheckBackwards[params[1]];
+}
+
+static cell AMX_NATIVE_CALL GetGlobalCheck( AMX* amx, cell* params )
+{
+	return GlobalCheck;
 }
 
 static cell AMX_NATIVE_CALL GetDamageCheck( AMX* amx, cell* params )
@@ -701,7 +844,7 @@ static cell AMX_NATIVE_CALL MoveFLAG( AMX* amx, cell* params )
 	BonusPoint[params[1]].zPOS = posz;
 	return 1;
 }
-int WasAdded[MAX_PLAYERS];
+
 static cell AMX_NATIVE_CALL ChangeState( AMX* amx, cell* params )
 {
 	int playerid = params[1];
@@ -736,12 +879,14 @@ static cell AMX_NATIVE_CALL ChangeState( AMX* amx, cell* params )
 		 			{
 						Drifting_precise[playerid] = 0;
 		 				GlobalPos_Timer[playerid] = -1;
-						OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],0);
+						OnPlayerDriftEnd(playerid,GlobalPos_Points[playerid],GlobalPos_Combo[playerid],2);
 						GlobalPos_Combo[playerid] = 0;
 						GlobalPos_Points[playerid] = 0;
 						Drifting[playerid] = 0;
 						return 3;
 		 			}
+					Drifting_precise[playerid] = 0;
+					Drifting[playerid] = 0;
 					return 2;
 				}
 				return 1;
@@ -749,8 +894,9 @@ static cell AMX_NATIVE_CALL ChangeState( AMX* amx, cell* params )
 		}
 		return 0;
 	}
-	return 1;
+	return (-1);
 }
+
 static cell AMX_NATIVE_CALL SetCheckForFlags( AMX* amx, cell* params )
 {
 	int gg_divider = params[1];
@@ -802,8 +948,11 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load( void **ppData )
 		g_MaxSpeed[loop] = MAXIMAL_SPEED;
 		g_divider[loop] = DIVIDER;
 		DamageCheck[loop] = DEFAULT_DMG;
+		CheckHim[loop] = DEFAULT_CHECK;
+		CheckBackwards[loop] = DEFAULT_BACKWARDS;
 		flagcheckingstatus[loop] = fENABLED;
 		DriftStartEndDelay[loop] = START_END_DELAY;
+		MaxHealthLoose[loop] = DEFAULT_MAX_HEALTH_LOOSE;
 		loop++;
 	}
 	cout << "    Drift Counter Plugin 2011 by Gamer_Z loaded";
@@ -866,6 +1015,19 @@ AMX_NATIVE_INFO driftAMXNatives[ ] =
 	{"Drift_GetCheckForFlags",GetCheckForFlags},
 
 	{"Drift_Private_ChangeState", ChangeState},
+
+	{"Drift_SetGlobalCheck", SetGlobalCheck},
+	{"Drift_GetGlobalCheck", GetGlobalCheck},
+
+	{"Drift_SetPlayerCheck", SetPlayerCheck},
+	{"Drift_GetPlayerCheck", GetPlayerCheck},
+
+	{"Drift_SetBackwardsCheck", SetBackwardsCheck},
+	{"Drift_GetBackwardsCheck", GetBackwardsCheck},
+
+	{"Drift_SetDriftMaxHealthLoose", SetDriftMaxHealthLoose},
+	{"Drift_GetDriftMaxHealthLoose", GetDriftMaxHealthLoose},
+
 	{0,                0}
 };
 
@@ -874,6 +1036,22 @@ PLUGIN_EXPORT int PLUGIN_CALL AmxLoad( AMX *amx )
 	pAMX = amx;
 	g_Invoke->amx_list.push_back(amx);
 	g_Invoke->getAddresses();
+    int amxerr = (-1);
+    amxerr = amx_FindPublic(pAMX, "OnPlayerDriftStart", &GlobOnStartIndex);
+    if (amxerr != AMX_ERR_NONE)
+	{
+		GlobOnStartIndex = (-1);
+	}
+    amxerr = amx_FindPublic(pAMX, "OnPlayerDriftUpdate", &GlobOnUpdateIndex);
+    if (amxerr != AMX_ERR_NONE)
+	{
+		GlobOnUpdateIndex = (-1);
+	}
+    amxerr = amx_FindPublic(pAMX, "OnPlayerDriftEnd", &GlobOnEndIndex);
+    if (amxerr != AMX_ERR_NONE)
+	{
+		GlobOnEndIndex = (-1);
+	}
 	return amx_Register( amx, driftAMXNatives, -1 );
 }
 
