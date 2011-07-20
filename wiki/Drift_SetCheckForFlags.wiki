@@ -2,7 +2,7 @@
 
 = Drift_SetCheckForFlags =
 
-The Drift_SetCheckForFlags function enables/disables (per-pplayer or for everyone) the checking if somebody drifts near a FLAG.
+The Drift_SetCheckForFlags function enables/disables (per-player or for everyone) the checking if somebody drifts near a FLAG.
 
 
 == The Code ==
