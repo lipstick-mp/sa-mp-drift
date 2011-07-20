@@ -30,3 +30,4 @@ public OnFilterScriptInit()
     Drift_SetGlobalCheck(0);//disables the plugin
     return 1;
 }
+</code>
