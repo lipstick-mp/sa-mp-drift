@@ -1,12 +1,12 @@
 #summary How to use IsPlayerDrifting_precise
 
-= IsPlayerDrifting_precise =
+= [IsPlayerDrifting_precise] =
 
-With IsPlayerDrifting_precise you can get the status if the player is ACTUALLY (at the moment) drifting or not.
+With [IsPlayerDrifting_precise] you can get the status if the player is ACTUALLY (at the moment) drifting or not.
 
 == The Code ==
 <code language="PAWN">
-native IsPlayerDrifting_precise(playerid);</code>
+native [IsPlayerDrifting_precise](playerid);</code>
 
 == Syntax ==
 ||Parameter||Type||Description||
@@ -21,7 +21,7 @@ public OnPlayerUpdate(playerid)
 {
 	if(IsPlayerDrifting(playerid) == 1)
 	{
-	    if(IsPlayerDrifting_precise(playerid) == 1)
+	    if([IsPlayerDrifting_precise](playerid) == 1)
 	    {
 	        print("player %d is in a drift and IS actually drifting!",playerid);
 	    }
