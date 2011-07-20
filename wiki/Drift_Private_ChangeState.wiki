@@ -1,4 +1,4 @@
-#summary Callback Drift_Private_ChangeState
+#summary Information on Drift_Private_ChangeState
 
 = Drift_Private_ChangeState =
 
