@@ -2,7 +2,7 @@
 
 = Drift_SetPlayerCheck =
 
-The Drift_SetPlayerCheck function enables/disables (per-player or for everyone) checking if somebody drift.
+The Drift_SetPlayerCheck function enables/disables (per-player or for everyone) checking if somebody drifts.
 
 
 If you disabled it for somebody, his drifts won't be counted.
