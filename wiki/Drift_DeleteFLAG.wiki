@@ -5,7 +5,7 @@
 The Drift_DeleteFLAG function can delete an existing FLAG.
 
 
-If Drift_ADDFLAG was not used it is possible to recover it with Drift_EnableFLAG.
+If Drift_AddFLAG was not used it is possible to recover it with Drift_EnableFLAG.
 
 
 == The Code ==
