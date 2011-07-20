@@ -12,7 +12,7 @@ native Drift_GetDriftMaxHealthLoose(&Float:MaximalHealthLoose,playerid = (0));
 
 == Syntax ==
 ||Parameter||Type||Description||
-||MaximalHealthLoose||(Return Value)Float||The amount of health that meay be lost||
+||MaximalHealthLoose||(Return Value)Float||The amount of health that may be lost||
 ||playerid||Integer||The playerid to get the info from||
 
 ||Returns||This function returns the status, enabled - 1 (backwars drifting not allowed), disabled - 0 (backwards drifting allowed)||
