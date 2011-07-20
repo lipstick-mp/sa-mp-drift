@@ -6,7 +6,7 @@ With DriftGet_DamageCheck you can get the option to check for damage while drift
 
 == The Code ==
 <code language="PAWN">
-native DriftGet_DamageCheck(playerid = (0),&Float:MaxHealthLoose = 0);</code>
+native DriftGet_DamageCheck(playerid = (0),&Float:MaxHealthLoose = 0.0);</code>
 
 == Syntax ==
 ||Parameter||Type||Description||
