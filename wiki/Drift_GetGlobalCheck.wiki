@@ -1,4 +1,4 @@
-#summary Callback Drift_GetGlobalCheck
+#summary How to use Drift_GetGlobalCheck
 
 = Drift_GetGlobalCheck =
 
