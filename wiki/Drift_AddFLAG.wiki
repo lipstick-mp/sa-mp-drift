@@ -1,8 +1,8 @@
 #summary How to use Drift_AddFLAG
 
-= Drift_AddFLAG =
+= [Drift_AddFLAG] =
 
-The Drift_AddFLAG function Creates a new FLAG.
+The [Drift_AddFLAG] function Creates a new FLAG.
 Flags are used to earn extra points for drifting as close as possible to them.
 Please see the video on how it works.
 Flags are processed in OnPlayerDriftUpdate.
@@ -10,7 +10,7 @@ Flags are processed in OnPlayerDriftUpdate.
 
 == The Code ==
 <code language="PAWN">
-native Drift_AddFLAG(Float:X,Float:Y,Float:Z);
+native [Drift_AddFLAG](Float:X,Float:Y,Float:Z);
 </code>
 
 == Syntax ==
@@ -28,7 +28,7 @@ native Drift_AddFLAG(Float:X,Float:Y,Float:Z);
 <code language="PAWN">
 public OnFilterScriptInit()
 {
-	new MyFlag = Drift_AddFLAG(462.283,2576.455,953.235);
+	new MyFlag = [Drift_AddFLAG](462.283,2576.455,953.235);
     return 1;
 }
 </code>
