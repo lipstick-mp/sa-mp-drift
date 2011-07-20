@@ -19,7 +19,7 @@ native DriftSet_UpdateDelay(delay);</code>
 <code language="PAWN">
 public OnFilterScriptInit()
 {
-	native DriftSet_UpdateDelay(40);
+	DriftSet_UpdateDelay(40);
 	return 1;
 }
 </code>
