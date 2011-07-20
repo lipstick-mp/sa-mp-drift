@@ -2,7 +2,7 @@
 
 = OnPlayerDriftUpdate =
 
-The OnPlayerDriftUpdate callback is called when a player meets all requirements* to (resume a) drift.
+The OnPlayerDriftUpdate callback is called when a player meets all requirements{{{*}}} to (resume a) drift.
 
 == The Code ==
 <code language="PAWN">
@@ -30,3 +30,9 @@ public OnPlayerDriftUpdate(playerid,value,combo,flagid,Float:distance,Float:spee
 	return 1;
 }
 </code>
+
+{{{*}}} Please see: 
+
+DriftSet_MinimalAngle 
+
+DriftSet_MinimalSpeed
