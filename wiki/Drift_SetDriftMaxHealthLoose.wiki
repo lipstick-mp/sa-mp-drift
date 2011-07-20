@@ -2,7 +2,7 @@
 
 = Drift_SetDriftMaxHealthLoose =
 
-The Drift_SetDriftMaxHealthLoose functionsets how many heal a players vehicle may loose (per-player or for everyone).
+The Drift_SetDriftMaxHealthLoose function sets how many heal a players vehicle may loose (per-player or for everyone).
 
 
 == The Code ==
