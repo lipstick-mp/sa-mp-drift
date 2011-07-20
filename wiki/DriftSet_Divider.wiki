@@ -37,14 +37,14 @@ public OnFilterScriptInit()
 //a) when drift divider is set to 250
 public OnPlayerDriftUpdate(playerid,value,combo,flagid,Float:distance,Float:speed)
 {
-	printf("%d");// will print "1000"
+	printf("%d",value);// will print "1000"
 	return 1;
 }
 
 //b) when drift divider is set to 100
 public OnPlayerDriftUpdate(playerid,value,combo,flagid,Float:distance,Float:speed)
 {
-	printf("%d");// will print "2500"
+	printf("%d",value);// will print "2500"
 	return 1;
 }
 </code>
