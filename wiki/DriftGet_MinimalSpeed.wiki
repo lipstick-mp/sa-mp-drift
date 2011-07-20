@@ -33,10 +33,10 @@ public OnFilterScriptInit()
 	//to the variable 'Speed'
 
 	#define MAX_PLAYERS (500)
-	new Float:AllSpeed![MAX_PLAYERS];//declare a new float array
+	new Float:AllSpeed[MAX_PLAYERS];//declare a new float array
 	for(new i; i < MAX_PLAYERS; ++i)
 	{
-		DriftGet_MinimalSpeed(AllSpeed![i],i);
+		DriftGet_MinimalSpeed(AllSpeed[i],i);
 	}	
 	//Above code will get the minimal drifting
 	//speed from all players and pass it
@@ -48,7 +48,7 @@ public OnFilterScriptInit()
 	new IsEverybodySynced = 1;//declare a new variable and set it to 1
 	for(new i; i < MAX_PLAYERS-1; ++i)
 	{
-		if(AllSpeed![i] != AllSpeed![i+1])
+		if(AllSpeed[i] != AllSpeed[i+1])
 		{
 			IsEverybodySynced = 0;//Not everybody has the same minimal speed
 			break;//get out of the for loop, we got 'what we want'
