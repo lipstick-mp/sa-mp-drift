@@ -2,6 +2,8 @@
 
 = DriftSet_MinimalAngle =
 
+Note: It is recomended that you read the 'DriftingAngle' article to understand this function better.
+
 With DriftSet_MinimalAngle you can set the minimal needed drift angle (in degrees).
 
 == The Code ==
