@@ -10,9 +10,9 @@ native DriftSet_DamageCheck(enable = 1,playerid = (-1),Float:MaxHealthLoose = 0.
 
 == Syntax ==
 ||Parameter||Type||Description||
-||enable||Integer||The player to get the divider from, -1 is invalid||
+||enable||Integer||1 - enabled, 0 - disabled||
 ||playerid||Integer||The player to get the divider from, -1 is invalid||
-||MaxHealthLoose||Float||The player to get the divider from, -1 is invalid||
+||MaxHealthLoose||Float||The max amount of heal points the car may loose in a short drift||
 
 ||Returns||This function does not return a specific value||
 
