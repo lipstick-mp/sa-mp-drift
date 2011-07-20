@@ -1,13 +1,13 @@
 #summary How to use Drift_EnableFLAG
 
-= Drift_EnableFLAG =
+= [Drift_EnableFLAG] =
 
-The Drift_EnableFLAG function can enable an disabled FLAG.
+The [Drift_EnableFLAG] function can enable an disabled FLAG.
 
 
 == The Code ==
 <code language="PAWN">
-native Drift_EnableFLAG(flagid);
+native [Drift_EnableFLAG](flagid);
 </code>
 
 == Syntax ==
@@ -23,9 +23,9 @@ native Drift_EnableFLAG(flagid);
 <code language="PAWN">
 public OnFilterScriptInit()
 {
-	new MyFlag = Drift_AddFLAG(462.283,2576.455,953.235);
-	Drift_DisableFLAG(MyFlag);
-	Drift_EnableFLAG(MyFlag);
+	new MyFlag = [Drift_AddFLAG](462.283,2576.455,953.235);
+	[Drift_DisableFLAG](MyFlag);
+	[Drift_EnableFLAG](MyFlag);
     return 1;
 }
 </code>
