@@ -2,7 +2,7 @@
 
 = DriftSet_Divider =
 
-With DriftSet_Divider you can set the points divider in OnPlayerDriftUpdate,
+With DriftSet_Divider you can set the points divider  for OnPlayerDriftUpdate and OnPlayerDriftEnd
 
 this is to avoid huge numbers.
 
