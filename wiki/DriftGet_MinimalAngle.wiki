@@ -43,7 +43,7 @@ public OnPlayerDriftUpdate(playerid,value,combo,flagid,Float:distance,Float:spee
 	    //check if minimal angle + 0.5 degrees is less than 65.0
 		{
 			DriftSet_MinimalAngle(minangle+0.5,playerid);
-			//if yes ass 0.5 degrees to the minimal angle to make it harder
+			//if yes add 0.5 degrees to the minimal angle to make it harder
 			//to drift
 		}
 	}
