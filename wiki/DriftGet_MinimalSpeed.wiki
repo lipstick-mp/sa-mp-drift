@@ -17,7 +17,7 @@ native DriftGet_MinimalSpeed(&Float:MinimalSpeed,playerid = (0));</code>
 
 == Usage ==
 
-<code language="PAWN">
+{{{
 public OnFilterScriptInit()
 {
 	new Float:Speed;//declare a float variable
@@ -61,4 +61,4 @@ public OnFilterScriptInit()
 	}
 	return 1;
 }
-</code>
+}}}
