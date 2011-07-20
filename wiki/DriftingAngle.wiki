@@ -1,7 +1,7 @@
 #summary What is the drifting angle?
 = Introduction =
 
-Drifting refers to a driving technique and to a motorsport where the driver intentionally over steers, causing loss of traction in the rear wheels through turns, while maintaining vehicle control and a high exit speed. A car is drifting when the rear <a href="http://en.wikipedia.org/wiki/Slip_angle">slip angle</a> is greater than the front slip angle prior to the corner apex, and the front wheels are pointing in the opposite direction to the turn (e.g. car is turning left, wheels are pointed right or vice versa), and the driver is controlling these factors. As a motor sport, professional drifting competitions are held worldwide. Drift racing challenges drivers to navigate a course in a sustained sideslip by exploiting coupled nonlinearities in the tire force response.
+"Drifting refers to a driving technique and to a motorsport where the driver intentionally over steers, causing loss of traction in the rear wheels through turns, while maintaining vehicle control and a high exit speed. A car is drifting when the rear <a href="http://en.wikipedia.org/wiki/Slip_angle">slip angle</a> is greater than the front slip angle prior to the corner apex, and the front wheels are pointing in the opposite direction to the turn (e.g. car is turning left, wheels are pointed right or vice versa), and the driver is controlling these factors. As a motor sport, professional drifting competitions are held worldwide. Drift racing challenges drivers to navigate a course in a sustained sideslip by exploiting coupled nonlinearities in the tire force response."
 
 == The Drifting Angle (Slip Angle made easy) ==
 
