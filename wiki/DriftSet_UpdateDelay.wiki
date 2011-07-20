@@ -1,0 +1,16 @@
+#summary How to use DriftSet_UpdateDelay
+
+= Introduction =
+
+With DriftSet_UpdateDelay you can set the amount of ticks between drift updates.
+
+
+= Details =
+
+test
+
+== xxx ==
+test2
+
+=== ccc ===
+test3
