@@ -2,7 +2,7 @@
 
 = Drift_GetDriftMaxHealthLoose =
 
-The Drift_GetDriftMaxHealthLoose function gets the amount of max health that a vehicle may loose per short drift per player.
+The Drift_GetDriftMaxHealthLoose function gets the amount of max health that a vehicle may loose per hit per player.
 
 
 == The Code ==
@@ -28,7 +28,7 @@ public OnFilterScriptInit()
 	Drift_GetDriftMaxHealthLoose(MaxLoose,35);
 	//Above code will assign to MaxLoose the maximal
 	//heal that the car of playerid 35 may loose
-	//per short drift
+	//per hit
     return 1;
 }
 </code>
