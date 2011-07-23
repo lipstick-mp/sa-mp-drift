@@ -11,7 +11,7 @@ native DriftGet_DamageCheck(playerid = (0),&Float:MaxHealthLoose = 0.0);</code>
 == Syntax ==
 ||Parameter||Type||Description||
 ||playerid||Integer||The player to get the DamageCheck from, -1 is invalid||
-||MaxHealthLoose||(Return Value)Float||Assigns a variable the max health points thay may be lost while in a short drift||
+||MaxHealthLoose||(Return Value)Float||Assigns a variable the max health points thay may be lost per hit||
 
 ||Returns||Returns the enabled status, 0 if disable, 1 if enabled||
 
@@ -24,7 +24,7 @@ public OnFilterScriptInit()
     new status = DriftGet_DamageCheck(4,MaxLoose);
     //gets the status of the damage check on playerid 4
     //and assigns MaxLoose the maximal health that has been set
-    //to may loose
+    //to may loose per hit
 	return 1;
 }
 </code>
