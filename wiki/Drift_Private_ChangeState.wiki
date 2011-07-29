@@ -1,5 +1,14 @@
 #summary Information on Drift_Private_ChangeState
-
+<div style="margin:20px; margin-top:5px; ">
+<div class="smallfont" style="margin-bottom:2px">Note:</div>
+<table cellpadding="6" cellspacing="0" border="0" width="100%">
+<tr>
+<td class="alt2" style="border: 1px solid #C2C2C2; font-size: 15pt;">
+<div style="font-style:italic">This function has been removed in revision 21</div>
+			
+</td>
+</tr>
+</table>
 = Drift_Private_ChangeState =
 
 The Drift_Private_ChangeState function is used internally by the plugin to update the vector list of players,
