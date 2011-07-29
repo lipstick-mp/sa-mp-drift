@@ -46,6 +46,14 @@
    # [Drift_DisableFLAG]
    # [Drift_EnableFLAG]
 
+==Model Manipulation==
+
+ * Model
+   # [Drift_ResetDefaultModelList]
+   # [Drift_ClearModelList]
+   # [Drift_DisallowModel]
+   # [Drift_AllowModel]
+
 ==Misc==
 
  * Other
