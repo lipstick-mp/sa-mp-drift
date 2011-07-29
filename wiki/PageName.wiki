@@ -1,12 +1,12 @@
-#summary How to use Drift_AllowModel
+#summary How to use [Drift_AllowModel]
 
-= Drift_AllowModel=
+= [Drift_AllowModel] =
 
-With Drift_AllowModel you can enable a vehicle model to drift (eg 425 which is a hunter).
+With pDrift_AllowModel[ you can enable a vehicle model to drift (eg 425 which is a hunter).
 
 == The Code ==
 <code language="PAWN">
-native Drift_AllowModel(modelid);</code>
+native pDrift_AllowModel[(modelid);</code>
 
 == Syntax ==
 ||Parameter||Type||Description||
@@ -19,7 +19,7 @@ native Drift_AllowModel(modelid);</code>
 <code language="PAWN">
 public OnFilterScriptInit()
 {
-    Drift_AllowModel(411);
+    pDrift_AllowModel[(411);
     //allows the vehicle model with id 411 (infernus) to drift.
 	return 1;
 }
