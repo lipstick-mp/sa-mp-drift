@@ -16,7 +16,7 @@ native [Drift_ResetDefaultModelList]();</code>
 
 == Usage ==
 
-<code language="PAWN">
+{{{
 public OnFilterScriptInit()
 {
     [Drift_ClearModelList]();
@@ -71,4 +71,4 @@ public OnFilterScriptInit()
     */
 	return 1;
 }
-</code>
+}}}
