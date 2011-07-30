@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="amx\amxplugin.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\callbacks.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\eventhandler.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\fakeamx.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\jump.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\logprintf.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\objects.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\players.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\samp.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\vehicles.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\wrapper.cpp">
+      <Filter>sampgdk</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="main.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="sampgdk">
+      <UniqueIdentifier>{ca6597c4-d9d4-49b6-98be-114e78d857eb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="amx\amx.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\callbacks.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\eventhandler.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\fakeamx.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\getch.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\jump.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\logprintf.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\objects.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\osdefs.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\players.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\plugin.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\plugincommon.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\samp.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\sclinux.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\vehicles.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\wrapper.h">
+      <Filter>sampgdk</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
