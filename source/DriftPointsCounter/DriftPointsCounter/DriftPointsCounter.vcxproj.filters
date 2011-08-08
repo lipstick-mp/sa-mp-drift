@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="amx\amxapihooks.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxplugin.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\callbacks.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\eventhandler.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\fakeamx.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\funcidx.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\gamemode.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\gpci.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\hooknative.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\jump.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\objects.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\players.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\samp.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\vehicles.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\wrapper.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\wrapperimpl.cpp">
+      <Filter>amx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="main.def" />
+    <None Include="includes.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="amx">
+      <UniqueIdentifier>{29c14aea-b395-4d35-81eb-82c2a4497bd0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="amx\amx.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\amxapihooks.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\amxplugin.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\callbacks.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\eventhandler.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\export.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\fakeamx.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\gamemode.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\getch.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\gpci.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\hooknative.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\jump.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\objects.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\players.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\samp.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\sclinux.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\vehicles.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\wrapper.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\wrapperimpl.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
