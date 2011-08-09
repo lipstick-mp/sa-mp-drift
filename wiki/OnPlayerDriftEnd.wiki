@@ -27,7 +27,7 @@ forward OnPlayerDriftEnd(playerid,value,combo,reason);</code>
 
 == Usage ==
 
-<code language="PAWN">
+{{{
 new string[128];
 public OnPlayerDriftEnd(playerid,value,combo,reason)
 {
@@ -53,4 +53,4 @@ public OnPlayerDriftEnd(playerid,value,combo,reason)
 	GameTextForPlayer(playerid,string,200,2);
 	return 1;
 }
-</code>
+}}}
