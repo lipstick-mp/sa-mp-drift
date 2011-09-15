@@ -15,7 +15,7 @@ public:
 
 //
 #define PLAYER_STATE_DRIVER			(2)
-#define PLUGIN_PRIVATE_UPDATE_DRIFT (30)//ticks - weird that not so much ticks is 1 second? :O
+#define PLUGIN_PRIVATE_UPDATE_DRIFT (30)//if [sa-mp variable] sleep is 5, then you have 1000/5 = 200 frames per second in sa-mp. this plugin will update each 30 frames at default
 #define MINIMAL_ANGLE				(12.5)//in degrees
 #define MAXIMAL_ANGLE				(360.0)//in degrees
 #define MINIMAL_SPEED				(20.0)//in meters / second
@@ -25,7 +25,7 @@ public:
 #define DIVIDER						(350)
 #define fENABLED					(1)
 #define MAX_PLAYERS					(500)
-#define PLUGIN_MAIN_VERSION			(23)
+#define PLUGIN_MAIN_VERSION			(24)//Well to avoid confusion I leave subversion at 0 and set this higher..
 #define PLUGIN_SUB_VERSION			(0)
 #define DEFAULT_MAX_HEALTH_LOOSE	(0.0);
 #define DEFAULT_CHECK				(1)
@@ -35,7 +35,7 @@ public:
 #define CHECK_MAX_VALUES
 //
 
-AMX * pAMX;
+//AMX * pAMX;
 
 #define PI (314159265/100000000)
 
@@ -56,16 +56,20 @@ Drifter::~Drifter()
 
 }
 
+vector<AMX *> amx_list;
+
 int RegisterServer();
 int RegisterServer()
 {
     int amxerr = (-1),idx;
-    amxerr = amx_FindPublic(pAMX, "PrivateDriftRegister", &idx);
-    if (amxerr == AMX_ERR_NONE)
+	for (std::vector<AMX *>::iterator a = amx_list.begin(); a != amx_list.end(); ++a)
 	{
-		amx_Exec(pAMX, NULL, idx);
-        return 1;
-    }
+		amxerr = amx_FindPublic(* a, "PrivateDriftRegister", &idx);
+		if (amxerr == AMX_ERR_NONE)
+		{
+			amx_Exec(* a, NULL, idx);
+		}
+	}
     return 0;
 }
 
@@ -129,44 +133,50 @@ bool AllowedModelList[613];//Yes I know too much allocated but it is only for pe
 int OnPlayerDriftStart(int playerid);
 int OnPlayerDriftStart(int playerid)
 {
-    if (!amx_FindPublic(pAMX, "OnPlayerDriftStart", &GlobOnStartIndex))
-    {
-		amx_Push(pAMX, playerid);
-		amx_Exec(pAMX, NULL, GlobOnStartIndex);
-        return 1;
-    }
+	for (std::vector<AMX *>::iterator a = amx_list.begin(); a != amx_list.end(); ++a)
+	{
+		if (!amx_FindPublic( * a, "OnPlayerDriftStart", &GlobOnStartIndex))
+		{
+			amx_Push(* a, playerid);
+			amx_Exec(* a, NULL, GlobOnStartIndex);
+		}
+	}
     return 0;
 }
 
 int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance,float speed);
 int OnPlayerDriftUpdate(int playerid,int points,int combo,int flagid,float distance,float speed)
 {
-    if (!amx_FindPublic(pAMX, "OnPlayerDriftUpdate", &GlobOnUpdateIndex))
-    {
-		amx_Push(pAMX, amx_ftoc(speed));
-		amx_Push(pAMX, amx_ftoc(distance));
-		amx_Push(pAMX, flagid);
-		amx_Push(pAMX, combo);
-		amx_Push(pAMX, points);
-		amx_Push(pAMX, playerid);
-		amx_Exec(pAMX, NULL, GlobOnUpdateIndex);
-        return 1;
-    }
+	for (std::vector<AMX *>::iterator a = amx_list.begin(); a != amx_list.end(); ++a)
+	{
+		if (!amx_FindPublic(* a, "OnPlayerDriftUpdate", &GlobOnUpdateIndex))
+		{
+			amx_Push(* a, amx_ftoc(speed));
+			amx_Push(* a, amx_ftoc(distance));
+			amx_Push(* a, flagid);
+			amx_Push(* a, combo);
+			amx_Push(* a, points);
+			amx_Push(* a, playerid);
+			amx_Exec(* a, NULL, GlobOnUpdateIndex);
+		}
+	}
     return 0;
 }
 
 int OnPlayerDriftEnd(int playerid,int points,int combo,int reason);
 int OnPlayerDriftEnd(int playerid,int points,int combo,int reason)
 {
-    if (!amx_FindPublic(pAMX, "OnPlayerDriftEnd", &GlobOnEndIndex))
-    {
-		amx_Push(pAMX, reason);
-		amx_Push(pAMX, combo);
-		amx_Push(pAMX, points);
-		amx_Push(pAMX, playerid);
-		amx_Exec(pAMX, NULL, GlobOnEndIndex);
-        return 1;
-    }
+	for (std::vector<AMX *>::iterator a = amx_list.begin(); a != amx_list.end(); ++a)
+	{
+		if (!amx_FindPublic(* a, "OnPlayerDriftEnd", &GlobOnEndIndex))
+		{
+			amx_Push(* a, reason);
+			amx_Push(* a, combo);
+			amx_Push(* a, points);
+			amx_Push(* a, playerid);
+			amx_Exec(* a, NULL, GlobOnEndIndex);
+		}
+	}
     return 0;
 }
 
@@ -955,12 +965,20 @@ AMX_NATIVE_INFO driftAMXNatives[ ] =
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxLoad( AMX *amx ) 
 {
-	pAMX = amx;
+	//pAMX = amx;
+	amx_list.push_back(amx);
 	return amx_Register( amx, driftAMXNatives, -1 );
 }
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxUnload( AMX *amx ) 
 {
+	for(std::vector<AMX *>::iterator i  = amx_list.begin(); i != amx_list.end(); ++i)
+	{
+		if(* i == amx)
+		{
+			amx_list.erase(i);
+		}
+	}
 	return AMX_ERR_NONE;
 }
 
