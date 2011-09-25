@@ -972,13 +972,11 @@ PLUGIN_EXPORT int PLUGIN_CALL AmxLoad( AMX *amx )
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxUnload( AMX *amx ) 
 {
-	for(std::vector<AMX *>::iterator i  = amx_list.begin(); i != amx_list.end(); ++i)
-	{
-		if(* i == amx)
-		{
-			amx_list.erase(i);
-		}
-	}
+	std::vector<AMX *>::iterator i = amx_list.begin(); 
+	while (i != amx_list.end())
+	{ 
+		i = amx_list.erase(i); 
+	} 
 	return AMX_ERR_NONE;
 }
 
